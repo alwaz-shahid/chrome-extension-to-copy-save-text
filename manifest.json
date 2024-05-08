@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Copy Highlight",
+  "name": "Text Copier",
   "version": "1.0",
-  "description": "Copy highlighted text from a webpage.",
+  "description": "Capture highlighted text and download it as a text file.",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage","downloads"
   ],
   "action": {
     "default_popup": "popup.html"

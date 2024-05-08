@@ -24,23 +24,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Text Copier</title>
-    <style>
-        body {
-            width: 300px;
-            height: 200px;
-            padding: 10px;
-        }
-        #copiedText {
-            font-size: 14px;
-            margin-top: 20px;
-        }
-    </style>
+  <title>Copied Text</title>
+  <style>
+    body {
+      padding: 30px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+
+    }
+    #copied-text {
+      font-size: 20px;
+      height: 400px;
+      width: 400px;
+      padding: 5px;
+      margin: 10px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Copied Text</h1>
-    <div id="copiedText"></div>
-    <button id="downloadButton">Download Text</button>
-    <script src="popup.js"></script>
+  <h1>Copied Text</h1>
+  <p id="copied-text">No text copied yet.</p>
+  <script src="popup.js"></script>
 </body>
 </html>

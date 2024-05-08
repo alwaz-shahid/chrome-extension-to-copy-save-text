@@ -1,26 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Text Copier",
-  "version": "1.0",
-  "description": "Capture highlighted text and download it as a text file.",
-  "permissions": [
-    "activeTab",
-    "storage","downloads"
+  "name": "Auto Copy & Save Highlight",
+  "version": "1.3",
+  "description": "Automatically copies highlighted text, saves it, and shows it in a popup.",
+  "permissions": ["activeTab", "storage","scripting"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
   ],
-  "action": {
-    "default_popup": "popup.html"
-  },
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.js"
-      ]
-    }
-  ]
+  "action": {
+    "default_popup": "popup.html"
+  }
 }

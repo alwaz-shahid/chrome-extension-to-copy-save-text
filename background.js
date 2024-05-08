@@ -1,48 +1,58 @@
-chrome.contextMenus.create({
-    id: "export-data",
-    title: "Export Highlighted Text",
-    contexts: ["browser_action"]
-});
+// chrome.runtime.onInstalled.addListener(() => {
+//   const currentVersion = chrome.runtime.getManifest().version;
+//   chrome.storage.local.get("extensionVersion", function(result) {
+//     const previousVersion = result.extensionVersion; // Retrieve the stored version
+//     if (currentVersion!== previousVersion) {
+//       chrome.tabs.query({}, (tabs) => {
+//         for (const tab of tabs) {
+//           chrome.tabs.executeScript(tab.id, { file: 'content.js' });
+//         }
+//       });
+//       chrome.storage.local.set({ "extensionVersion": currentVersion }); // Store the new version
+//     }
+//   });
+// });
 
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
-    if (info.menuItemId === "export-data") {
-        exportData();
-    }
-});
+chrome.runtime.onInstalled.addListener(() => {
+  const currentVersion = chrome.runtime.getManifest().version;
+  chrome.storage.local.get("extensionVersion", function(result) {
+    const previousVersion = result.extensionVersion; // Retrieve the stored version
+    if (currentVersion!== previousVersion) {
+      chrome.tabs.query({}, (tabs) => {
+        for (const tab of tabs) {
+          // Example of executing a script file
+          chrome.scripting.executeScript({
+            target: { tabId: tab.id, allFrames: true },
+            files: ['content_scripts/content.js']
+          });
 
-function downloadTextFile(text) {
-    var filename = "highlighted_text.txt";
-    var blob = new Blob([text], { type: "text/plain" });
-    chrome.downloads.download({
-        url: URL.createObjectURL(blob),
-        filename: filename,
-        conflictAction: "prompt"
-    });
-}
-
-function exportData() {
-    chrome.storage.local.get(['highlightedText'], function (result) {
-        var text = result.highlightedText || "";
-        downloadTextFile(text);
-    });
-}
-
-chrome.browserAction.onClicked.addListener(function (tab) {
-    chrome.tabs.executeScript({
-        code: "window.getSelection().toString();"
-    }, function (selection) {
-        var text = selection[0];
-        if (text) {
-            chrome.storage.local.get(['highlightedText'], function (result) {
-                var previousText = result.highlightedText || "";
-                var currentText = previousText + "\n" + text;
-                chrome.storage.local.set({ 'highlightedText': currentText }, function () {
-                    alert("Text has been copied and saved!");
-                    downloadTextFile(currentText);
-                });
-            });
-        } else {
-            alert("No text highlighted.");
+          // Or, if you're executing inline code, use the `function` property
+          // chrome.scripting.executeScript({
+          //   target: { tabId: tab.id, allFrames: true },
+          //   function: functionToExecute
+          // });
         }
-    });
+      });
+      chrome.storage.local.set({ "extensionVersion": currentVersion }); // Store the new version
+    }
+  });
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message === "copyText") {
+    const selection = window.getSelection();
+    if (selection.toString().trim() !== "") {
+      navigator.clipboard.writeText(selection.toString())
+        .then(() => {
+          chrome.storage.local.set({ "copiedText": selection.toString() });
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id, "copiedTextSaved");
+          });
+          console.log("Copied text saved to local storage!");
+        })
+        .catch(() => {
+          console.error("Failed to copy text!");
+        });
+    }
+  }
 });

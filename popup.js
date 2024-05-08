@@ -1,7 +1,3 @@
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message === "showCopiedText") {
-      const copiedTextElement = document.getElementById("copied-text");
-      copiedTextElement.textContent = message || "No text copied yet.";
-    }
-  });
-  
+chrome.storage.local.get(['copiedText'], function(result) {
+  document.getElementById('copiedText').innerText = result.copiedText || 'No text copied yet.';
+});
